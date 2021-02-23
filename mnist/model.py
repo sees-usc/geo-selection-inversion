@@ -1,0 +1,172 @@
+import numpy as np
+import util
+import keras
+from keras.models import Model
+from keras.layers import Layer, Flatten, LeakyReLU
+from keras.layers import Input, Reshape, Dense, Lambda
+from keras.layers import Conv2D, MaxPooling2D, UpSampling2D
+
+from keras.layers import Conv1D, UpSampling1D
+from keras.layers import AveragePooling1D, MaxPooling1D
+
+from keras import backend as K
+from keras.engine.base_layer import InputSpec
+
+from keras.optimizers import Adam, SGD, RMSprop
+from keras.layers.normalization import BatchNormalization
+from keras.losses import mse, binary_crossentropy
+from keras import regularizers, activations, initializers, constraints
+from keras.constraints import Constraint
+from keras.callbacks import History, EarlyStopping
+
+from keras.utils import plot_model, to_categorical
+from keras.models import load_model
+
+from keras.utils.generic_utils import get_custom_objects
+
+import string
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+import matplotlib.cm as cm
+from matplotlib.colors import Normalize
+
+from sklearn.metrics import classification_report, confusion_matrix
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
+def RMSE(x, y):
+    return np.sqrt(np.mean(np.square(x.flatten() - y.flatten())))
+
+class GSI:
+
+	def __init__(self, M, M_label, sample_ratio=0.3, simulator=None, class_names=[]):
+
+		self.simulator = simulator
+
+		self.M = M 
+		self.M_label = M_label
+		self.class_names = class_names
+
+		#for step 1 - classification 
+		self.M_classify = []
+		self.M_label_classify = []
+		self.D_classify = []
+		self.ratio = sample_ratio
+		self.classifier = []
+		self.classifier_feature_space = []
+		self.proportion = []
+
+		#for step 2 - inversion 
+		self.regressor = []
+        
+	def collect_sampled_data_classification(self):
+		'''collect data using sampled (at self.ratio) model realizations for step 1 - classification
+		'''
+		np.random.seed(999)
+		indexes = np.random.choice(np.arange(0, self.M.shape[0]), size=int(self.M.shape[0]*self.ratio), replace=False)
+		self.M_classify = self.M[indexes]
+		self.M_label_classify = self.M_label[indexes]
+		self.D_classify = self.simulator(self.M_classify)
+		print("Forward simulations ran : " + str(len(indexes)) + " out of " + str(self.M.shape[0]) + " models.")
+        
+	def encoder1D(self):
+
+		input_dt = Input(shape=(self.D_classify.shape[1],))
+
+		_ = Dense(100)(input_dt)
+		_ = LeakyReLU(alpha=0.3)(_)
+
+		_ = Dense(80)(_)
+		_ = LeakyReLU(alpha=0.3)(_)
+
+		_ = Dense(60)(_)
+		_ = LeakyReLU(alpha=0.3)(_)
+
+		_ = Dense(40)(_)
+		_ = LeakyReLU(alpha=0.3)(_)
+
+		encoded_d = Dense(2)(_)
+		out = Dense(10, activation = "softmax")(encoded_d)
+
+		return input_dt, encoded_d, out
+
+	def train_classifier(self, epoch=300, load=False):
+
+		self.collect_sampled_data_classification()
+
+		#classification model
+		input_dt, encoded_d, out = self.encoder1D()
+		self.classifier = Model(input_dt, out)
+		self.classifier.compile(optimizer=Adam(lr=1e-3), loss="categorical_crossentropy", metrics=['accuracy'])
+		#self.classifier.summary()
+		plot_model(self.classifier, to_file='readme/classifier.png')
+
+		if not load:
+			plot_losses = util.PlotLosses()
+			self.classifier.fit(self.D_classify, to_categorical(self.M_label_classify),        
+				epochs=epoch,
+				batch_size=32,
+				shuffle=True,
+				validation_split=0.2,
+				callbacks=[plot_losses])
+
+			self.classifier.save('readme/classifier.h5')
+		else:
+			print("Trained model loaded")
+			self.classifier = load_model('readme/classifier.h5')
+		    
+		#for visualization of feature space only
+		self.classifier_feature_space = Model(self.classifier.layers[0].input, self.classifier.layers[9].output)
+            
+	def inspect_classifier(self):
+		'''test performance of classifier on a set of randomly sampled validation data
+		'''
+		np.random.seed(9999)
+		indexes = np.random.choice(np.arange(0, self.M.shape[0]), size=int(self.M.shape[0]*self.ratio), replace=False)
+		M_classify_val = self.M[indexes]
+		M_label_classify_val = self.M_label[indexes]
+		D_classify_val = self.simulator(M_classify_val)
+		
+		M_label_classify_val_hat = self.classifier.predict(D_classify_val)
+
+		matrix = confusion_matrix(M_label_classify_val, M_label_classify_val_hat.argmax(axis=1))
+		util.plot_confusion_matrix(cm=matrix, classes=self.class_names, normalize=False, title='Confusion Matrix')
+		
+		val_loss, val_acc = self.classifier.evaluate(D_classify_val,  to_categorical(M_label_classify_val), verbose=2)
+		print('Validation accuracy:', val_acc)
+
+	def get_proportion(self, d_obs, d_obs_label, m_ref):
+		self.proportion = self.classifier.predict(d_obs)
+		plt.figure(figsize=[8, 4])
+		plt.subplot(1, 2, 1)
+		util.plot_image(self.proportion, d_obs_label, m_ref, self.class_names)
+		plt.subplot(1, 2, 2)
+		util.plot_value_array(self.proportion, d_obs_label)
+		plt.tight_layout()
+		plt.show()
+		
+	def collect_resampled_data_inversion(self):
+		'''collect simulation data from a resampled set of relevant models
+		  according to the proportion in self.proportion
+		'''
+
+
+
+
+		
+		
+
+
+        
+        
+        
+        
+
+
+    
