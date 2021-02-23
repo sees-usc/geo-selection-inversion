@@ -119,6 +119,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
 	plt.tight_layout()
 	plt.ylabel('True label')
 	plt.xlabel('Predicted label')
+	return fig
 
 def plot_image(proportion, d_obs_label, m_ref, class_names):
 	true_label, img = d_obs_label, np.squeeze(m_ref)

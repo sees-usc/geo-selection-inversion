@@ -63,8 +63,8 @@ class DataLoader:
 		self.x_test = x_test
 		self.y_train = y_train
 		self.y_test = y_test
-		self.y_reg_train = y_reg_train
-		self.y_reg_test = y_reg_test
+		self.y_reg_train = np.expand_dims(y_reg_train, axis=-1)
+		self.y_reg_test = np.expand_dims(y_reg_test, axis=-1)
 
 		if self.verbose: 
 			print("Loaded training data x {:s} and y {:s} and y_labels {:s}".format(str(self.x_train.shape), str(self.y_reg_train.shape), str(self.y_train.shape)))
@@ -86,6 +86,6 @@ class DataLoader:
 			ds[i:i+1, :] = np.reshape((ms[i:i+1, :, :, 0]), [1, ms.shape[1]*ms.shape[2]])@self.sim 
 		ds = ds/self.maxs
 
-		return ds
+		return np.expand_dims(ds, axis=-1)
              
  
