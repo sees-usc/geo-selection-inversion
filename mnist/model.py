@@ -274,30 +274,32 @@ class GSI:
 	
 		#compare reference model "m_ref" with prediction given "d_obs"
 		m_ref_hat = self.regressor.predict(d_obs)
-		#m_ref_hat = np.where(m_ref_hat<0.5, 0, 1)
+
 		#run forward simulation on predicted model and compare with "d_obs"
 		d_sim = self.simulator(m_ref_hat)
 		
-		fig = plt.figure(figsize=(15, 5))
-		plt.subplot(1, 3, 1)
-		plt.imshow(np.squeeze(m_ref), cmap='GnBu', vmin=0, vmax=1)
+		fig = plt.figure(figsize=[10, 10], tight_layout=True)
+		gs = gridspec.GridSpec(2, 2)
+		
+		ax = fig.add_subplot(gs[0, 0])
+		ax.imshow(np.squeeze(m_ref), cmap='GnBu', vmin=0, vmax=1)
 		plt.grid(False), plt.xticks([]), plt.yticks([])
 		plt.title('Reference')
-		plt.subplot(1, 3, 2)
-		plt.imshow(np.squeeze(m_ref_hat), cmap='GnBu', vmin=0, vmax=1)
+		
+		ax = fig.add_subplot(gs[0, 1])
+		ax.imshow(np.squeeze(m_ref_hat), cmap='GnBu', vmin=0, vmax=1)
 		plt.grid(False), plt.xticks([]), plt.yticks([])
 		plt.title('Inversion')
-		plt.subplot(1, 3, 3)
-		plt.plot(np.squeeze(d_obs), ls=':', c='k', label='True', alpha=0.9)
-		plt.plot(np.squeeze(d_sim), c='r', label='Pred.', alpha=0.4)
-		plt.ylim([0, 1])
+		
+		ax = fig.add_subplot(gs[1, :])
+		ax.plot(np.squeeze(d_obs), ls=':', c='k', label='True', alpha=0.9)
+		ax.plot(np.squeeze(d_sim), c='r', label='Pred.', alpha=0.4)
+		plt.ylim([np.min(d_obs)-0.15, np.max(d_obs)+0.15])
 		plt.title('Data match RMSE_'+str(round(RMSE(d_obs, d_sim),4)))
+		
 		plt.legend()
-		plt.tight_layout()
 		plt.show()
 		fig.savefig('readme/inv.png')
-		
-		
 		
 		
 		
