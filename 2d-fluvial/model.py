@@ -299,6 +299,8 @@ class GSI:
 		plt.legend()
 		plt.show()
 		fig.savefig('readme/inv.png')
+		
+		return m_ref_hat
 
 		
 		

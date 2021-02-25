@@ -149,8 +149,30 @@ def plot_value_array(proportion, d_obs_label):
 	thisplot[predicted_label].set_color('red')
 	thisplot[true_label].set_color('blue')
 	
+def normalize(arr):
+	arr_min = np.min(arr)
+	return (arr-arr_min)/(np.max(arr)-arr_min)
 
-    
+def plot_cube(cube, angle=320):
+	'''cube must be 3d
+	'''
+	cube = normalize(cube)
+	cube = np.expand_dims(cube, axis=-1)            #28x28x1
+	facecolors = cm.GnBu(cube)                      #28x28x4
+	filled = np.ones(cube.shape)                    #28x28x1
+
+	x, y, z = np.indices(np.array(cube.shape)+1)    #29x29x2 for each axis
+
+	fig = plt.figure(figsize=[6, 6])  
+	ax = fig.gca(projection='3d')
+	ax.view_init(30, angle)
+	ax.set_axis_off()
+	ax.set_box_aspect((cube.shape[0], cube.shape[1], 5))
+
+	ax.voxels(x, y, z, filled = filled, facecolors=facecolors, linewidth=0.0001)
+
+	plt.show()
+
     
     
 
