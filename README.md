@@ -22,6 +22,6 @@ The workflow consists of two steps:
 * **Step 2**: Perform model calibration using the selected geologic scenarios, using a regression CNN. The regression CNN model learns the inverse mapping from the production data space to the lowrank representation of the model realizations within the feasible set. 
 Once the model is trained off-line, a fast feed-forward operation on the observed historical production data (input `d_obs`) is used to reconstruct a calibrated model. 
 
-![workflow](readme/workflow.jpg)
+![workflow](readme/workflow.png)
 
 The presented approach offers an opportunity to utilize flow data in identifying plausible geologic scenarios, results in an off-line implementation that is conveniently parallellizable, and can generate calibrated models in real time, i.e., upon availability of data and without in-depth technical expertise about model calibration. Computational efficiency is achieved by pruning irrelevant scenarios before the model calibration step.  
