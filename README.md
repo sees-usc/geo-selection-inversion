@@ -1,6 +1,6 @@
 # geo-selection-inversion
 
-Implementation and demo for "Convolutional neural networks (CNN) for feature-based model calibration under uncertain geologic scenarios" by Mohd-Razak and Jafarpour (2020) as published in Computational Geosciences. The paper presents convolutional neural network architectures for integration of dynamic flow response data to reduce the uncertainty in geologic scenarios and calibrate subsurface flow models.
+Implementation and demo for ["Convolutional neural networks (CNN) for feature-based model calibration under uncertain geologic scenarios"](https://link.springer.com/article/10.1007/s10596-020-09971-4) by Mohd-Razak and Jafarpour (2020) as published in Computational Geosciences. The paper presents convolutional neural network architectures for integration of dynamic flow response data to reduce the uncertainty in geologic scenarios and calibrate subsurface flow models.
 
 ```
 geo-selection-inversion 
