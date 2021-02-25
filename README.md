@@ -13,6 +13,8 @@ geo-selection-inversion
 ```
 Demos based on the MNIST dataset, a 2D gaussian field dataset and a 2D fluvial field dataset (see folder structure) are archived in this repository.
 
+![demo](readme/demo.jpg)
+
 ## Workflow
 
 The workflow consists of two steps:
