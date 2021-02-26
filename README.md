@@ -15,6 +15,8 @@ Demos based on the MNIST dataset, a 2D gaussian field dataset and a 2D fluvial f
 
 ![demo](readme/demo.jpg)
 
+**Note** : The [source repository](https://github.com/rsyamil/geo-selection-inversion) includes large files that may be excluded in this repo. 
+
 ## Workflow
 
 The workflow consists of two steps:
